@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITAES Dashboard — 13 Hệ thống WebGIS</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg-card: #1e293b;
+    --bg-card-hover: #273449;
+    --border: #334155;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+    padding: 32px 40px 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  header h1 .badge {
+    background: rgba(255,255,255,.2);
+    color: #fff;
+    font-size: 13px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  header p { color: rgba(255,255,255,.8); font-size: 14px; }
+
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .toolbar input,
+  .toolbar select {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.25);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: all .2s;
+  }
+  .toolbar input::placeholder { color: rgba(255,255,255,.6); }
+  .toolbar input:focus,
+  .toolbar select:focus {
+    background: rgba(255,255,255,.25);
+    border-color: #fff;
+  }
+  .toolbar input { flex: 1; min-width: 240px; }
+  .toolbar select option { color: #000; }
+  .toolbar button {
+    background: rgba(255,255,255,.2);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all .2s;
+  }
+  .toolbar button:hover {
+    background: rgba(255,255,255,.35);
+  }
+  .toolbar button.active {
+    background: #fff;
+    color: #1e40af;
+  }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    padding: 24px 40px 0;
+  }
+  .stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+  }
+  .stat .label {
+    color: var(--text-dim);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+  }
+  .stat .value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .stat .value.online { color: var(--success); }
+  .stat .value.offline { color: var(--danger); }
+  .stat .value.checking { color: var(--warning); }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    padding: 24px 40px 60px;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: all .25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    opacity: 0;
+    transition: opacity .25s;
+  }
+  .card:hover {
+    background: var(--bg-card-hover);
+    border-color: #475569;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .card-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dim);
+    background: #0f172a;
+    border: 1px solid var(--border);
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    position: relative;
+    margin-top: 12px;
+  }
+  .status-dot.online  { background: var(--success); box-shadow: 0 0 0 4px rgba(34,197,94,.2); }
+  .status-dot.offline { background: var(--danger);  box-shadow: 0 0 0 4px rgba(239,68,68,.2); }
+  .status-dot.checking {
+    background: var(--warning);
+    animation: pulse 1.2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: .3; }
+  }
+
+  .card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    flex: 1;
+    margin-bottom: 4px;
+  }
+  .card .sysname {
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+    color: var(--primary);
+    background: rgba(59,130,246,.12);
+    padding: 3px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    width: fit-content;
+  }
+  .card .url {
+    font-family: 'Consolas', monospace;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    word-break: break-all;
+    line-height: 1.4;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 4px;
+  }
+  .card-actions a,
+  .card-actions button {
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border);
+  }
+  .btn-ghost:hover {
+    background: #334155;
+    border-color: #475569;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+    font-size: 15px;
+    grid-column: 1 / -1;
+  }
+
+  /* Iframe modal */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: none;
+    padding: 30px;
+  }
+  .modal.open { display: flex; }
+  .modal-inner {
+    background: var(--bg-card);
+    border-radius: 14px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  }
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: #16213a;
+  }
+  .modal-head h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70%;
+  }
+  .modal-head .close {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    transition: all .2s;
+  }
+  .modal-head .close:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+  }
+  .modal-body { flex: 1; position: relative; }
+  .modal-body iframe {
+    width: 100%; height: 100%;
+    border: none;
+    background: #fff;
+  }
+  .modal-body .loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    background: var(--bg-card);
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-dim);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 768px) {
+    header, .stats, .grid { padding-left: 20px; padding-right: 20px; }
+    header h1 { font-size: 20px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>
+    ITAES Dashboard
+    <span class="badge">13 hệ thống WebGIS</span>
+  </h1>
+  <p>Trung tâm điều hành và giám sát các hệ thống WebGIS — <strong>itaes.vn</strong></p>
+  <div class="toolbar">
+    <input id="search" type="text" placeholder="🔍  Tìm theo tên, sysname hoặc URL...">
+    <button data-filter="all" class="filter-btn active">Tất cả</button>
+    <button data-filter="online" class="filter-btn">Online</button>
+    <button data-filter="offline" class="filter-btn">Offline</button>
+    <button id="btnRecheck">↻ Kiểm tra lại</button>
+    <button id="btnOpenAll">↗ Mở tất cả</button>
+  </div>
+</header>
+
+<section class="stats">
+  <div class="stat">
+    <div class="label">Tổng hệ thống</div>
+    <div class="value" id="statTotal">13</div>
+  </div>
+  <div class="stat">
+    <div class="label">Online</div>
+    <div class="value online" id="statOnline">—</div>
+  </div>
+  <div class="stat">
+    <div class="label">Offline</div>
+    <div class="value offline" id="statOffline">—</div>
+  </div>
+  <div class="stat">
+    <div class="label">Đang kiểm tra</div>
+    <div class="value checking" id="statChecking">—</div>
+  </div>
+</section>
+
+<main class="grid" id="grid"></main>
+
+<footer>
+  © ITAES Dashboard — Dữ liệu từ <a href="http://itaes.vn/" target="_blank" style="color:var(--primary)">itaes.vn</a>
+</footer>
+
+<!-- Modal xem trước -->
+<div class="modal" id="modal">
+  <div class="modal-inner">
+    <div class="modal-head">
+      <h4 id="modalTitle">—</h4>
+      <div style="display:flex;gap:8px">
+        <a id="modalOpenNew" class="btn-primary" href="#" target="_blank"
+           style="padding:8px 14px;border-radius:8px;text-decoration:none;font-size:13px;">Mở tab mới</a>
+        <button class="close" onclick="closeModal()">✕</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="loading" id="modalLoading">Đang tải trang... (có thể bị chặn bởi X-Frame-Options)</div>
+      <iframe id="modalIframe" src="about:blank"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== DỮ LIỆU 13 HỆ THỐNG ====================
+const SYSTEMS = [
+  { stt: 1,  sysname: "truotlohsp",    name: "Hệ thống WebGIS theo dõi nguy cơ trượt lở đất do mưa, cảnh báo sớm - hành động sớm và ứng phó" },
+  { stt: 2,  sysname: "airpollution",  name: "Giám sát ô nhiễm không khí" },
+  { stt: 3,  sysname: "bacduong",      name: "Thủy lợi Bắc Đuống" },
+  { stt: 4,  sysname: "binhdinh",      name: "Thủy lợi Bình Định" },
+  { stt: 5,  sysname: "detectstorm",   name: "Dò tìm Xoáy thuận nhiệt đới" },
+  { stt: 6,  sysname: "dienbien",      name: "DSS ngập lụt LVS Nậm Rớm" },
+  { stt: 7,  sysname: "drought",       name: "Giám sát hạn" },
+  { stt: 8,  sysname: "koreanvietnam", name: "Mô hình khí hậu-thủy văn-thủy lực ĐBSCL" },
+  { stt: 9,  sysname: "quangtri",      name: "DSS ngập lụt Quảng Trị" },
+  { stt: 10, sysname: "songda",        name: "Mưa cực trị LVS Đà" },
+  { stt: 11, sysname: "tpdienbien",    name: "Ngập lụt đô thị Điện Biên" },
+  { stt: 12, sysname: "vgtb",          name: "Tài nguyên nước LVS VGTB" },
+  { stt: 13, sysname: "livinglab",     name: "Mangroves Living Lab Project" },
+];
+
+const BASE = "http://itaes.vn/";
+const STATUS = {}; // sysname -> 'checking' | 'online' | 'offline'
+
+// ==================== RENDER ====================
+const grid = document.getElementById('grid');
+
+function render() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const filter = document.querySelector('.filter-btn.active').dataset.filter;
+
+  const filtered = SYSTEMS.filter(s => {
+    const matchQ = !q
+      || s.name.toLowerCase().includes(q)
+      || s.sysname.toLowerCase().includes(q)
+      || (BASE + s.sysname + '.html').toLowerCase().includes(q);
+    const st = STATUS[s.sysname] || 'checking';
+    const matchF = filter === 'all' || filter === st;
+    return matchQ && matchF;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty">Không tìm thấy hệ thống nào phù hợp.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(s => {
+    const url = BASE + s.sysname + '.html';
+    const st = STATUS[s.sysname] || 'checking';
+    const stLabel = st === 'online' ? 'Hoạt động'
+                  : st === 'offline' ? 'Không truy cập được'
+                  : 'Đang kiểm tra...';
+    return `
+      <div class="card">
+        <div class="card-head">
+          <div class="card-num">${String(s.stt).padStart(2,'0')}</div>
+          <div class="status-dot ${st}" title="${stLabel}"></div>
+        </div>
+        <h3>${escapeHtml(s.name)}</h3>
+        <div>
+          <div class="sysname">${s.sysname}</div>
+        </div>
+        <div class="url">${url}</div>
+        <div class="card-actions">
+          <button class="btn-primary" onclick="openPreview('${s.sysname}', '${escapeAttr(s.name)}', '${url}')">
+            👁 Xem trước
+          </button>
+          <a class="btn-ghost" href="${url}" target="_blank" rel="noopener">↗ Mở</a>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+}
+function escapeAttr(str) {
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// ==================== KIỂM TRA ONLINE ====================
+function checkStatus(sysname) {
+  STATUS[sysname] = 'checking';
+  updateStats();
+  render();
+
+  const url = BASE + sysname + '.html';
+  const img = new Image();
+  const timeout = setTimeout(() => {
+    if (STATUS[sysname] === 'checking') {
+      STATUS[sysname] = 'offline';
+      updateStats();
+      render();
+    }
+  }, 8000);
+
+  // Dùng fetch no-cors chỉ để biết có phản hồi hay không
+  fetch(url, { mode: 'no-cors', cache: 'no-store' })
+    .then(() => {
+      clearTimeout(timeout);
+      STATUS[sysname] = 'online';
+      updateStats();
+      render();
+    })
+    .catch(() => {
+      clearTimeout(timeout);
+      STATUS[sysname] = 'offline';
+      updateStats();
+      render();
+    });
+}
+
+function checkAll() {
+  SYSTEMS.forEach((s, i) => setTimeout(() => checkStatus(s.sysname), i * 250));
+}
+
+function updateStats() {
+  const total = SYSTEMS.length;
+  const online = Object.values(STATUS).filter(v => v === 'online').length;
+  const offline = Object.values(STATUS).filter(v => v === 'offline').length;
+  const checking = Object.values(STATUS).filter(v => v === 'checking').length
+                 + (total - Object.keys(STATUS).length);
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statOnline').textContent = online;
+  document.getElementById('statOffline').textContent = offline;
+  document.getElementById('statChecking').textContent = checking;
+}
+
+// ==================== MODAL PREVIEW ====================
+const modal = document.getElementById('modal');
+const modalIframe = document.getElementById('modalIframe');
+const modalTitle = document.getElementById('modalTitle');
+const modalOpenNew = document.getElementById('modalOpenNew');
+const modalLoading = document.getElementById('modalLoading');
+
+function openPreview(sysname, name, url) {
+  modalTitle.textContent = name;
+  modalOpenNew.href = url;
+  modalLoading.style.display = 'flex';
+  modalLoading.textContent = 'Đang tải trang...';
+  modalIframe.src = url;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Nếu sau 6s iframe vẫn chưa load được, hiện gợi ý
+  modalIframe.onload = () => { modalLoading.style.display = 'none'; };
+  setTimeout(() => {
+    if (modalLoading.style.display !== 'none') {
+      modalLoading.innerHTML = '⚠ Trang có thể chặn nhúng iframe (X-Frame-Options).<br>Hãy dùng nút <b>Mở tab mới</b> ở trên.';
+    }
+  }, 6000);
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  modalIframe.src = 'about:blank';
+  document.body.style.overflow = '';
+}
+
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ==================== EVENTS ====================
+document.getElementById('search').addEventListener('input', render);
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  });
+});
+document.getElementById('btnRecheck').addEventListener('click', checkAll);
+document.getElementById('btnOpenAll').addEventListener('click', () => {
+  if (!confirm('Mở tất cả 13 tab? Trình duyệt có thể chặn popup.')) return;
+  SYSTEMS.forEach((s, i) => {
+    setTimeout(() => window.open(BASE + s.sysname + '.html', '_blank'), i * 300);
+  });
+});
+
+// ==================== KHỞI TẠO ====================
+render();
+checkAll();
+</script>
+</body>
+</html>
