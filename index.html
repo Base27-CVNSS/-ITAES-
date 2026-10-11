@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d1829">
+<meta name="description" content="ITAES Dashboard | Trung tâm 13 hệ thống WebGIS, mở nguyên bản trong một không gian điều hành.">
+<title>ITAES Dashboard — WebGIS Command Center</title>
+<style>
+:root{--nav:#0d192b;--nav2:#142841;--bg:#f5f8fc;--white:#fff;--ink:#15263e;--sub:#63758e;--border:#e1e9f2;--blue:#176bf4;--cyan:#31c5ed;--green:#0dac82;--radius:15px;--shadow:0 8px 28px #264d8010}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}button,a,input,select{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #6ab6ff;outline-offset:2px}
+.layout{display:grid;grid-template-columns:258px minmax(0,1fr);min-height:100vh}
+.sidebar{height:100vh;position:sticky;top:0;display:flex;flex-direction:column;background:var(--nav);color:#daeafa;z-index:10}
+.brand{display:flex;gap:12px;align-items:center;padding:26px 19px;border-bottom:1px solid #27394e}.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(140deg,#176ef6,#1ccae1);color:white;display:grid;place-items:center;font-size:21px;font-weight:900;box-shadow:0 12px 24px #1477f83b}.brand b{font-size:16px}.brand small{display:block;color:#7692ad;font-size:10px;letter-spacing:1.6px;font-weight:800}.sidebar-scroll{padding:17px 11px;overflow-y:auto;flex:1}.groupname{color:#6a869f;font-size:10px;letter-spacing:1.8px;font-weight:800;text-transform:uppercase;padding:15px 13px 9px}.navitem{width:100%;border:1px solid transparent;border-radius:9px;background:transparent;color:#a7bdd2;display:flex;gap:10px;align-items:center;padding:10px 12px;text-align:left;margin-bottom:3px}.navitem:hover{background:#1a314a;color:#fff}.navitem.active{background:#1e68c827;color:#e8f5ff;border-color:#2c78da63}.navitem .count{margin-left:auto;color:#a8caff;background:#243d5b;padding:1px 8px;border-radius:7px;font-size:11px}.sysnav{width:100%;display:flex;gap:9px;align-items:center;border:0;border-radius:9px;background:transparent;color:#91aabe;text-align:left;padding:9px 10px}.sysnav:hover,.sysnav.active{background:#17304b;color:white}.sysnav i{font-style:normal;font-size:10px;font-weight:800;color:#80baff;border-radius:7px;background:#233d58;padding:4px 6px}.sysnav span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}.sidebar-end{padding:17px 21px;border-top:1px solid #26384b;color:#718ca6;font-size:11px}.sidebar-end a{color:#a8d9ff}
+.page{min-width:0}.topbar{height:72px;background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 clamp(16px,3vw,38px)}.crumb{color:#7890a6;font-size:12px;display:flex;gap:10px;align-items:center;min-width:0}.crumb b{font-size:12px;color:#243c56;font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.topright{display:flex;gap:9px;align-items:center}.toplabel{font-size:10px;letter-spacing:.7px;font-weight:800;color:#3078b9;background:#eef6ff;border-radius:99px;padding:8px 11px;white-space:nowrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;border:1px solid var(--border);border-radius:9px;background:white;color:#446078;padding:8px 13px;font-size:12px;font-weight:750;white-space:nowrap}.btn:hover{background:#f3f8ff;border-color:#add0fa}.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}.btn.blue:hover{background:#0d55ce}.btn.dark{background:#23415f;color:#e5f6ff;border-color:#43678a}.btn.dark:hover{background:#31597d}.menu{display:none}.container{padding:28px clamp(16px,3vw,38px) 38px;max-width:1880px;margin:auto}
+.hero{background:radial-gradient(ellipse at 93% 40%,#20548670,transparent 52%),linear-gradient(130deg,#112948,#0b1c32 72%);border-radius:19px;padding:29px 35px;color:#fff;position:relative;overflow:hidden;min-height:206px;display:flex;align-items:center;justify-content:space-between;gap:10px}.eyebrow{color:#72d4f8;letter-spacing:2px;font-size:10px;font-weight:900;text-transform:uppercase}.hero h1{font-size:clamp(24px,2.5vw,34px);letter-spacing:-1px;line-height:1.19;margin:12px 0}.hero p{color:#a1bdd8;max-width:650px;font-size:13px;margin:0 0 17px}.hero svg{height:170px;width:170px;flex:none;opacity:.8}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin:21px 0 29px}.stat{background:white;border:1px solid var(--border);border-radius:14px;padding:19px 21px;box-shadow:var(--shadow);min-width:0}.statlabel{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#71849a;font-weight:750}.statlabel em{font-style:normal;background:#eff6ff;font-size:17px;border-radius:10px;padding:5px 10px}.statvalue{font-size:30px;font-weight:900;color:#16497c;line-height:1.25;margin:13px 0 7px}.stat small{color:#8c9cae;font-size:10.5px}.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:0 0 17px}.sectionhead h2{font-size:20px;letter-spacing:-.4px;margin:0}.sectionhead p{font-size:12px;color:var(--sub);margin:4px 0 0}.filters{display:flex;gap:9px;flex-wrap:wrap}.filters input,.filters select{background:white;border:1px solid #dae5ef;border-radius:9px;height:41px;color:#31516d;padding:0 12px}.filters input{min-width:255px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.card{display:flex;flex-direction:column;gap:13px;min-width:0;min-height:202px;border:1px solid var(--border);border-radius:15px;background:white;padding:20px;box-shadow:var(--shadow);transition:transform .2s,border-color .2s,box-shadow .2s}.card:hover{border-color:#a9cafa;transform:translateY(-3px);box-shadow:0 14px 36px #24456c18}.cardtop{display:flex;align-items:center;justify-content:space-between}.cardicon{font-size:21px;display:grid;place-items:center;background:#edf6ff;width:42px;height:42px;border-radius:11px}.cardno{color:#95a3b4;letter-spacing:1px;font-size:10px;font-weight:800}.card h3{font-size:14px;font-weight:750;line-height:1.45;margin:0;min-height:40px}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{font-size:10px;color:#256cb4;font-weight:750;background:#eaf4ff;padding:3px 8px;border-radius:6px}.chip.second{color:#75889d;background:#f2f6fa}.actions{margin-top:auto;display:flex;gap:8px}.actions .open{flex:1;border-radius:9px;background:#edf5ff;color:#0861d2;border:1px solid #d8eafa;font-size:12px;font-weight:800;padding:9px}.actions .open:hover{background:#176bf4;color:white}.actions a{border:1px solid var(--border);border-radius:9px;padding:8px 12px;color:#55718b;font-size:12px;font-weight:700}.actions a:hover{border-color:#95bff6;color:#1364c8}.noresult{grid-column:1/-1;text-align:center;color:#728398;padding:45px;background:white;border:1px dashed #cdddec;border-radius:14px}.note{color:#61768a;font-size:11px;background:white;border:1px solid var(--border);padding:14px 16px;border-radius:12px;margin-top:20px}
+.viewer{display:none}.viewer.active{display:block}.overview.hide{display:none}.viewer-top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:17px}.viewer-top h1{font-size:21px;line-height:1.3;margin:5px 0 2px}.viewer-top p{color:#72879e;font-size:12px;margin:0}.view-actions{display:flex;gap:8px;flex-wrap:wrap}.view-layout{display:grid;grid-template-columns:206px minmax(0,1fr);gap:15px}.view-menu{border:1px solid var(--border);border-radius:13px;background:white;overflow:auto;max-height:calc(100vh - 210px);align-self:start}.view-menu-label{padding:16px 12px 12px;color:#7c91a5;letter-spacing:1px;font-size:10px;font-weight:900;text-transform:uppercase}.viewlink{width:100%;text-align:left;display:flex;align-items:center;gap:8px;border:0;border-bottom:1px solid #f0f4f9;border-left:3px solid transparent;background:#fff;color:#61768b;padding:12px 10px;font-size:11px}.viewlink:hover{background:#f3f8ff}.viewlink.active{border-left-color:var(--blue);background:#eaf4ff;color:#125eb1}.viewlink b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.viewlink i{font-style:normal;color:#91a2b5;font-weight:800;font-size:10px}
+.browser{border:1px solid var(--border);border-radius:14px;background:white;overflow:hidden;box-shadow:var(--shadow);min-width:0}.browserbar{padding:10px 14px;display:flex;gap:9px;align-items:center;border-bottom:1px solid var(--border);background:#f8fafd}.dots{display:flex;gap:5px}.dots i{width:9px;height:9px;border-radius:50%;background:#67cf9e}.dots i:first-child{background:#f27e7b}.dots i:nth-child(2){background:#ffc96b}.url{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#fff;border:1px solid var(--border);color:#64788f;padding:7px 10px;border-radius:8px;font:11px ui-monospace,Consolas,monospace}.framearea{height:max(570px,calc(100vh - 265px));min-height:350px;position:relative;background:#f6f9fc}.framearea iframe{display:block;width:100%;height:100%;border:0;background:#fff}.frameinfo{padding:12px 14px;border-top:1px solid var(--border);background:#fbfcfe;color:#60738a;font-size:11px;line-height:1.55}.frameinfo b{color:#385c82}.browser:fullscreen .framearea{height:calc(100vh - 103px)}.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px clamp(16px,3vw,38px) 25px;color:#8da0b4;font-size:11px}.footer a{color:#2a78b6}
+@media(max-width:1180px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.view-layout{grid-template-columns:165px minmax(0,1fr)}}
+@media(max-width:860px){.layout{display:block}.sidebar{position:fixed;width:258px;left:0;top:0;transform:translateX(-100%);transition:transform .2s;box-shadow:10px 0 35px #08162b30}.sidebar.show{transform:translateX(0)}.menu{display:inline-flex}.hero{padding:25px}.topbar{height:63px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.view-layout{grid-template-columns:minmax(0,1fr)}.view-menu{display:none}}
+@media(max-width:590px){.hero svg{display:none}.hero{min-height:auto}.hero h1{font-size:24px}.cards{grid-template-columns:1fr}.sectionhead{display:block}.filters{margin-top:13px}.filters input{width:100%;min-width:0}.view-actions{width:100%}.view-actions .btn{flex:1}.viewer-top h1{font-size:17px}.framearea{height:calc(100dvh - 270px);min-height:365px}.toplabel,.topright .hide-mobile{display:none}.stat{padding:14px}.statvalue{font-size:25px}.container{padding-top:20px}.topbar{padding:0 13px}.footer{padding-left:13px;padding-right:13px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar" id="sidebar" aria-label="Điều hướng">
+ <div class="brand"><div class="logo">I.</div><div><b>ITAES Dashboard</b><small>WEBGIS COMMAND CENTER</small></div></div>
+ <div class="sidebar-scroll">
+  <div class="groupname">Trung tâm điều hành</div>
+  <button class="navitem active" id="navOverview">◫ &nbsp; Tổng quan <span class="count">13</span></button>
+  <button class="navitem" id="navOriginal">▣ &nbsp; HTML Dashboard gốc</button>
+  <div class="groupname">13 hệ thống WebGIS</div>
+  <div id="sideSystems"></div>
+ </div>
+ <div class="sidebar-end">ITAES · WebGIS Library<br>Giao diện điều hành riêng biệt<br><a href="https://github.com/Base27-CVNSS/-ITAES-/" target="_blank" rel="noopener noreferrer">GitHub Repository ↗</a></div>
+</aside>
+<div class="page">
+<header class="topbar">
+ <div style="display:flex;align-items:center;gap:12px;min-width:0"><button id="toggleMenu" class="btn menu" aria-label="Mở menu">☰</button><div class="crumb"><span>ITAES</span><span>/</span><b id="breadcrumb">Tổng quan</b></div></div>
+ <div class="topright"><span class="toplabel">13 WEBGIS MODULES</span><a class="btn hide-mobile" href="https://github.com/Base27-CVNSS/-ITAES-/" target="_blank" rel="noopener noreferrer">⌘ GitHub</a><button class="btn" id="topOriginal">▣ HTML gốc</button></div>
+</header>
+<div class="container">
+<section class="overview" id="overview">
+ <div class="hero"><div><div class="eyebrow">Environmental Intelligence Platform / 2026</div><h1>Giám sát môi trường.<br>Hiểu dữ liệu không gian.</h1><p>13 hệ thống WebGIS trong một không gian điều hành. Nhấp vào một hệ thống để xem HTML nguyên bản bên trong Dashboard mà không sửa cấu trúc trang nguồn.</p><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:19px"><button class="btn blue" id="explore">Khám phá hệ thống ↗</button><button class="btn dark" id="heroOriginal">Xem Dashboard gốc</button></div></div>
+ <svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><circle cx="100" cy="100" r="82" stroke="#64bdf7" opacity=".65"/><ellipse cx="100" cy="100" rx="37" ry="82" stroke="#64bdf7" opacity=".6"/><ellipse cx="100" cy="100" rx="82" ry="30" stroke="#64bdf7" opacity=".6"/><path d="M18 100h164M100 18v164" stroke="#64bdf7" opacity=".4"/><path d="M65 51L145 104 97 152 65 51Z" stroke="#74e1ff" stroke-dasharray="3 5"/><circle cx="65" cy="51" r="5" fill="#6be1ff"/><circle cx="145" cy="104" r="5" fill="#6be1ff"/><circle cx="97" cy="152" r="5" fill="#6be1ff"/></svg></div>
+ <div class="stats">
+  <div class="stat"><div class="statlabel">Tổng hệ thống <em>▦</em></div><div class="statvalue">13</div><small>Danh mục WebGIS từ HTML gốc</small></div>
+  <div class="stat"><div class="statlabel">Lĩnh vực <em>◈</em></div><div class="statvalue" id="groupCount">5</div><small>Nhóm chủ đề để tra cứu</small></div>
+  <div class="stat"><div class="statlabel">Đường dẫn nguồn <em>↗</em></div><div class="statvalue">13</div><small>Liên kết tham chiếu · chưa xác minh</small></div>
+  <div class="stat"><div class="statlabel">HTML gốc <em>◇</em></div><div class="statvalue">01</div><small>Bảo lưu độc lập, không chỉnh sửa</small></div>
+ </div>
+ <div class="sectionhead" id="catalog"><div><h2>Thư viện hệ thống WebGIS</h2><p>Chọn một thẻ để mở trong không gian làm việc.</p></div><div class="filters"><input type="search" id="search" placeholder="⌕ Tìm tên, mã, lĩnh vực..." aria-label="Tìm hệ thống"><select id="filter" aria-label="Lọc lĩnh vực"><option value="all">Tất cả lĩnh vực</option></select></div></div>
+ <div class="cards" id="cards"></div>
+ <div class="note"><strong>Về nội dung gốc:</strong> Khung hiển thị dùng <code>iframe</code>, không sao chép hoặc sửa DOM/CSS/JavaScript của tệp nhúng. Website ngoài có thể chặn nhúng hoặc không hỗ trợ HTTPS. Với HTML riêng của từng hệ thống, có thể đặt bản sao nguyên trạng tại <code>systems/&lt;sysname&gt;.html</code> để nhúng trực tiếp trong GitHub Pages.</div>
+</section>
+<section class="viewer" id="viewer" aria-label="Không gian làm việc WebGIS">
+ <div class="viewer-top"><div><div class="eyebrow">WebGIS / Workspace</div><h1 id="viewerTitle">WebGIS</h1><p id="viewerSubtitle">Khung xem HTML nguyên bản.</p></div><div class="view-actions"><button class="btn" id="back">← Tổng quan</button><button class="btn" id="reload">↻ Tải lại</button><button class="btn" id="full">⛶ Toàn màn hình</button><a class="btn blue" href="#" id="external" target="_blank" rel="noopener noreferrer">↗ Mở trang nguồn</a></div></div>
+ <div class="view-layout"><nav class="view-menu" aria-label="Chuyển hệ thống"><div class="view-menu-label">Chuyển hệ thống</div><div id="viewMenu"></div></nav><div class="browser" id="browser">
+  <div class="browserbar"><span class="dots"><i></i><i></i><i></i></span><div class="url" id="activeUrl">Chưa chọn URL</div><button class="btn" id="copy">Sao chép URL</button></div>
+  <div class="framearea"><iframe id="frame" src="about:blank" title="Nội dung WebGIS nguyên bản" allow="fullscreen; geolocation" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+  <div class="frameinfo" id="frameInfo" role="status">Nội dung WebGIS sẽ hiển thị tại đây.</div>
+ </div></div>
+</section>
+</div>
+<footer class="footer"><span>© 2026 ITAES Dashboard · HTML nguồn độc lập</span><span><a href="original/ITAES-Dashboard-13-WebGIS.html" target="_blank" rel="noopener noreferrer">Bản gốc</a> · <a href="https://github.com/Base27-CVNSS/-ITAES-/" target="_blank" rel="noopener noreferrer">GitHub</a></span></footer>
+</div>
+</div>
+<script>
+"use strict";
+// 13 items preserved in order, identifier and title from supplied HTML.
+const systems=[
+ {id:"truotlohsp",name:"Hệ thống WebGIS theo dõi nguy cơ trượt lở đất do mưa, cảnh báo sớm - hành động sớm và ứng phó",cat:"Thiên tai",icon:"⛰️"},
+ {id:"airpollution",name:"Giám sát ô nhiễm không khí",cat:"Môi trường",icon:"🌫️"},
+ {id:"bacduong",name:"Thủy lợi Bắc Đuống",cat:"Thủy lợi",icon:"💧"},
+ {id:"binhdinh",name:"Thủy lợi Bình Định",cat:"Thủy lợi",icon:"💧"},
+ {id:"detectstorm",name:"Dò tìm Xoáy thuận nhiệt đới",cat:"Thiên tai",icon:"🌀"},
+ {id:"dienbien",name:"DSS ngập lụt LVS Nậm Rớm",cat:"Thiên tai",icon:"🌊"},
+ {id:"drought",name:"Giám sát hạn",cat:"Môi trường",icon:"☀️"},
+ {id:"koreanvietnam",name:"Mô hình khí hậu-thủy văn-thủy lực ĐBSCL",cat:"Nghiên cứu",icon:"🧪"},
+ {id:"quangtri",name:"DSS ngập lụt Quảng Trị",cat:"Thiên tai",icon:"🌊"},
+ {id:"songda",name:"Mưa cực trị LVS Đà",cat:"Thiên tai",icon:"🌧️"},
+ {id:"tpdienbien",name:"Ngập lụt đô thị Điện Biên",cat:"Thiên tai",icon:"🌊"},
+ {id:"vgtb",name:"Tài nguyên nước LVS VGTB",cat:"Tài nguyên nước",icon:"🗺️"},
+ {id:"livinglab",name:"Mangroves Living Lab Project",cat:"Nghiên cứu",icon:"🌱"}
+];
+const original={id:"original",name:"ITAES Dashboard — 13 Hệ thống WebGIS (HTML gốc)",cat:"Bản gốc",icon:"▣"};
+const all=[original,...systems], $=id=>document.getElementById(id);
+const BASE="http://itaes.vn/";
+const sourceUrl=s=>BASE+s.id+".html";
+const htmlEscape=str=>String(str).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let current=null,token=0;
+function makeNavigation(){
+ $("sideSystems").innerHTML=systems.map((s,i)=>'<button class="sysnav" data-go="'+s.id+'" title="'+htmlEscape(s.name)+'"><i>'+String(i+1).padStart(2,"0")+'</i><span>'+htmlEscape(s.name)+'</span></button>').join("");
+ $("viewMenu").innerHTML=all.map((s,i)=>'<button class="viewlink" data-go="'+s.id+'"><i>'+String(i).padStart(2,"0")+'</i><b>'+htmlEscape(s.name)+'</b></button>').join("");
+ document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>openSystem(b.dataset.go)));
+ const groups=[...new Set(systems.map(s=>s.cat))];$("groupCount").textContent=groups.length;
+ $("filter").innerHTML='<option value="all">Tất cả lĩnh vực</option>'+groups.map(x=>'<option value="'+htmlEscape(x)+'">'+htmlEscape(x)+'</option>').join("");
+}
+function makeCards(){
+ const q=$("search").value.trim().toLocaleLowerCase("vi"), f=$("filter").value;
+ const items=systems.filter(s=>(f==="all"||f===s.cat)&&[s.id,s.name,s.cat].some(x=>x.toLocaleLowerCase("vi").includes(q)));
+ $("cards").innerHTML=items.length?items.map(s=>{
+ const i=systems.indexOf(s)+1;
+ return '<article class="card"><div class="cardtop"><span class="cardicon">'+s.icon+'</span><span class="cardno">WEBGIS / '+String(i).padStart(2,"0")+'</span></div><h3>'+htmlEscape(s.name)+'</h3><div class="chips"><span class="chip">'+htmlEscape(s.cat)+'</span><span class="chip second">'+htmlEscape(s.id)+'</span></div><div class="actions"><button class="open" data-open="'+s.id+'">↗ Xem trong Dashboard</button><a href="'+sourceUrl(s)+'" target="_blank" rel="noopener noreferrer" aria-label="Trang nguồn của '+htmlEscape(s.id)+'">↗ Nguồn</a></div></article>';
+ }).join(""):'<div class="noresult">Không tìm thấy hệ thống phù hợp.</div>';
+ document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>openSystem(b.dataset.open)));
+}
+function markActive(id){
+ $("navOverview").classList.toggle("active",!id);$("navOriginal").classList.toggle("active",id==="original");
+ document.querySelectorAll("[data-go]").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+}
+function overview(updateHash=true){
+ token++; current=null;$("overview").classList.remove("hide");$("viewer").classList.remove("active");
+ $("frame").src="about:blank";$("breadcrumb").textContent="Tổng quan";markActive(null);$("sidebar").classList.remove("show");
+ if(updateHash)history.replaceState(null,"",location.pathname+location.search);
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+async function locateHTML(s,seq){
+ if(s.id==="original")return "original/ITAES-Dashboard-13-WebGIS.html";
+ // Local standalone originals take priority when supplied in systems/.
+ const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),2200);
+ try{
+  const r=await fetch("systems/"+s.id+".html",{method:"HEAD",signal:controller.signal,cache:"no-store"});
+  if(seq!==token)return null;
+  if(r.ok&&(r.headers.get("content-type")||"").includes("text/html"))return "systems/"+s.id+".html";
+ }catch(e){/* No local copy; try HTTPS origin. */}finally{clearTimeout(timeout)}
+ return "https://itaes.vn/"+s.id+".html";
+}
+async function openSystem(id){
+ const s=all.find(x=>x.id===id);if(!s)return;
+ const seq=++token;current=s;$("overview").classList.add("hide");$("viewer").classList.add("active");
+ $("viewerTitle").textContent=s.name;$("viewerSubtitle").textContent=s.id==="original"?"Bản sao chính xác của tệp Dashboard gốc, lưu độc lập.":s.cat+" · Mã hệ thống: "+s.id+" · Hiển thị trong iframe.";
+ $("breadcrumb").textContent=s.name;
+ $("frame").src="about:blank";$("activeUrl").textContent="Đang xác định địa chỉ...";$("frameInfo").textContent="⏳ Đang tìm bản HTML độc lập để hiển thị.";
+ $("external").href=s.id==="original"?"original/ITAES-Dashboard-13-WebGIS.html":sourceUrl(s);
+ markActive(id);$("sidebar").classList.remove("show");history.replaceState(null,"",location.pathname+location.search+"#"+encodeURIComponent(id));window.scrollTo(0,0);
+ const src=await locateHTML(s,seq);if(!src||seq!==token)return;
+ $("frame").src=src;$("activeUrl").textContent=new URL(src,location.href).href;
+ const local=src.startsWith("systems/")||s.id==="original";
+ $("frameInfo").innerHTML=local?'✅ Đang sử dụng tệp HTML nguyên bản trong repository. Dashboard không sửa nội dung, CSS hay JavaScript của trang nhúng.':'⚠️ Đang thử nhúng phiên bản HTTPS của website nguồn. Nếu khung trắng, website có thể chặn iframe hoặc không có HTTPS. Dùng nút <b>Mở trang nguồn</b>, hoặc đặt tệp HTML gốc tại <b>systems/'+htmlEscape(s.id)+'.html</b> để hiển thị nội bộ.';
+}
+$("navOverview").addEventListener("click",()=>overview());
+for(const id of ["navOriginal","topOriginal","heroOriginal"])$(id).addEventListener("click",()=>openSystem("original"));
+$("back").addEventListener("click",()=>overview());
+$("explore").addEventListener("click",()=>$("catalog").scrollIntoView({behavior:"smooth"}));
+$("search").addEventListener("input",makeCards);$("filter").addEventListener("change",makeCards);
+$("toggleMenu").addEventListener("click",()=>$("sidebar").classList.toggle("show"));
+$("reload").addEventListener("click",()=>{if(current){const f=$("frame"),src=f.getAttribute("src");f.src="about:blank";requestAnimationFrame(()=>f.src=src);}});
+$("full").addEventListener("click",()=>{if(document.fullscreenElement)document.exitFullscreen();else $("browser").requestFullscreen?.();});
+$("copy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("activeUrl").textContent);$("copy").textContent="✓ Đã sao chép";}catch(e){$("copy").textContent="Không sao chép được";}setTimeout(()=>$("copy").textContent="Sao chép URL",1800);});
+window.addEventListener("hashchange",()=>{let id=decodeURIComponent(location.hash.slice(1));if(!id)overview(false);else if(all.some(s=>s.id===id)&&current?.id!==id)openSystem(id);});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("sidebar").classList.contains("show"))$("sidebar").classList.remove("show");});
+makeNavigation();makeCards();
+const initial=decodeURIComponent(location.hash.slice(1));if(all.some(s=>s.id===initial))openSystem(initial);
+</script>
+</body>
+</html>
